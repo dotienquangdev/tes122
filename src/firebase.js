@@ -3,6 +3,7 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
 } from "firebase/auth";
 
@@ -29,6 +30,8 @@ provider.setCustomParameters({
 console.info("GoogleAuthProvider:", provider);
 // Helper to sign in with Google (shows account chooser if multiple Google accounts are present)
 export const signInWithGoogle = () => signInWithPopup(auth, provider);
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, provider);
 
 // Helper to sign out current user
 export const signOutUser = () => signOut(auth);

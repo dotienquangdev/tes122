@@ -1,6 +1,6 @@
 ﻿import React from "react";
-import { signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
-import { auth, provider } from "./firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth, signInWithGoogle, signInWithGoogleRedirect } from "./firebase";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -25,10 +25,29 @@ function App() {
 
   const login = async () => {
     try {
-      await signInWithPopup(auth, provider);
+      await signInWithGoogle();
     } catch (err) {
       console.error("Login error:", err);
-      alert("Đăng nhập thất bại:123 " + (err.message || err));
+      const code = err && err.code ? err.code : "";
+      if (code === "auth/popup-blocked" || code === "auth/pop-up-blocked") {
+        alert(
+          "Popup bị chặn — bỏ chặn popup hoặc dùng chuyển hướng. Thử redirect..."
+        );
+        try {
+          await signInWithGoogleRedirect();
+        } catch (rErr) {
+          console.error("Redirect sign-in error:", rErr);
+          alert(
+            "Đăng nhập thất bại bằng redirect: " +
+              (rErr && rErr.message ? rErr.message : rErr)
+          );
+        }
+        return;
+      }
+      if (code === "auth/popup-closed-by-user") {
+        return;
+      }
+      alert("Đăng nhập thất bại: " + (err && err.message ? err.message : err));
     }
   };
 
